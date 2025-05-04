@@ -1,0 +1,21 @@
+# Core LLM & HTTP clients
+groq>=0.8.0
+httpx>=0.23.0
+
+# Caching & memory
+redis>=4.5.0
+langdetect>=1.0.9
+
+# Retrieval & embeddings
+faiss-cpu>=1.7.4
+sentence-transformers>=2.2.2
+
+# Deep learning backends (for embeddings / optional writer/verifier models)
+torch>=2.0.0
+tensorflow>=2.19.0
+
+# Frontend
+gradio>=5.29.0
+
+# Utilities
+numpy>=1.24.0

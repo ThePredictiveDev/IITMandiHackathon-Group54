@@ -195,6 +195,15 @@ def run_chat_turn(user_input: str):
         "EVIDENCE:\n" + sections["EVIDENCE"]
     )
     set_cached(user_input, {"display": main_display})
+    
+    # ——— finally return the pipeline result ———
+    return {
+        "type":     "pipeline",
+        "planner":  plan,    # full planner dict
+        "chunks":   topk,    # list of chunk dicts used
+        "verifier": verif,   # full verifier JSON
+        "writer":   full     # full streaming text from writer
+     }
 
 # ── tiny helpers for the UI ──────────────────────────────────────────
 def clear_hot_cache() -> str:

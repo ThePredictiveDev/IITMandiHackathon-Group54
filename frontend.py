@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import asyncio, json, re, gradio as gr
-from chatbot import run_chat_turn, clear_hot_cache, clear_mem
+from chatbot import run_chat_turn
 from memory  import get_memory
+from cache   import _redis as redis_client, _local_cache   # reuse existing objects
+from memory  import _stm
 
 # ────────── helpers ────────────────────────────────────────────────
 def format_memory_md():
@@ -26,6 +28,14 @@ def writer_sections(txt: str) -> dict[str, str]:
         blk = re.sub(rf"^{lab}\s*:\s*", "", blk, flags=re.I)  # dedup label
         sections[lab] = blk
     return sections
+
+def _clear_memory():
+    _stm.clear()
+
+def _clear_cache():
+    try:   redis_client.flushdb()
+    except Exception: pass
+    _local_cache.clear()
 
 
 def compact_answer(txt:str):
@@ -71,12 +81,19 @@ def full_cot_md(res:dict)->str:
 
 # ────────── async wrapper ──────────────────────────────────────────
 async def chat_backend(user_msg, chat_hist):
+    logs_md = ""                                   # <‑‑ always defined
+    cot_md  = ""
+
     loop=asyncio.get_event_loop()
     res = await loop.run_in_executor(None, run_chat_turn, user_msg)
 
      # ---- guarantee we have a dict ----
-    if not isinstance(res, dict):
-        res = {"type": "error", "message": "Unexpected pipeline response."}
+    # ── guarantee we work with a dict ─────────────────────────────
+    # (When the fast‑path in run_chat_turn returns None.)
+    if res is None:
+        res = {"type": "error", "message": "No data returned from pipeline."}
+    elif not isinstance(res, dict):
+        res = {"type": "error", "message": f"Unexpected pipeline type: {type(res)}"}
 
     # decide visible message
     if res.get("type") == "pipeline":
@@ -94,8 +111,6 @@ async def chat_backend(user_msg, chat_hist):
 
     chat_hist.append((user_msg, answer))
     mem_md  = format_memory_md()
-    cot_md  = full_cot_md(res)
-    log_md  = detailed_logs(res)
     return chat_hist, mem_md, cot_md, log_md, ""   # clear input box
 
 # ────────── UI ─────────────────────────────────────────────────────
@@ -124,13 +139,14 @@ with gr.Blocks(css=CSS, theme=gr.themes.Soft()) as demo:
     with gr.Row():
         # chat & input
         with gr.Column(scale=3):
-            chatbot = gr.Chatbot(height=600, label=None)          # full‑height GPT‑like
+            chatbot = gr.Chatbot(height=600, label=None, value=[])  # full‑height GPT‑like
             with gr.Row():
                 txt_in  = gr.Textbox(
                             placeholder="Ask a MATLAB / Simulink troubleshooting question…",
                             show_label=False, lines=1, autofocus=True, scale=4)
                 send_btn   = gr.Button("Send",   variant="primary", scale=1)
-                clear_btn  = gr.Button("⟲ Reset chat", scale=1)
+                clear_btn  = gr.Button("⟲ Reset chat", variant="primary", scale=1)
+
 
         # side drawer (memory + logs) inside Tabs
         with gr.Column(scale=1):
@@ -143,8 +159,8 @@ with gr.Blocks(css=CSS, theme=gr.themes.Soft()) as demo:
                     log_md  = gr.Markdown(elem_classes="side-box")
                 with gr.TabItem("🗑️ Controls"):
                     gr.Markdown("*Maintenance*")
-                    clr_cache = gr.Button("Clear cache")
-                    clr_mem   = gr.Button("Clear memory")
+                    clr_mem  = gr.Button("Clear Memory",   variant="destructive", size="sm")
+                    clr_cache= gr.Button("Clear Cache",    variant="destructive", size="sm")
 
     # ---------- wiring ----------
     def _disable(): return gr.update(interactive=False)
@@ -164,7 +180,17 @@ with gr.Blocks(css=CSS, theme=gr.themes.Soft()) as demo:
 
     clear_btn.click(lambda: ([], "", "", "", ""), outputs=[chatbot, mem_box, cot_md, log_md, txt_in])
 
-    clr_cache.click(lambda: clear_hot_cache(),   None, log_md)
-    clr_mem.click(  lambda: clear_mem(),        None, log_md)
+    def _do_clear_mem():
+        _clear_memory()
+        gr.Info("Memory cleared ✅")
+        return format_memory_md()
+
+    clr_mem.click(_do_clear_mem, None, mem_box)
+
+    def _do_clear_cache():
+        _clear_cache()
+        return gr.Info("Cache cleared ✅")
+
+    clr_cache.click(_do_clear_cache, None, None)
 
 demo.launch(share=True)
