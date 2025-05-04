@@ -1,0 +1,332 @@
+# Batch run @ 2025-05-04T09:45:47 UTC
+
+## Q1: After changing the Receive block’s sample time to 0.1, why is my sine wave still distorted?
+
+THOUGHT:
+THOUGHT:
+The persistent distortion suggests that while the sample times now match, there may still be issues with the Queue block's capacity or the system's timing performance. If the Queue is too small or the model's execution is overloaded, messages might still be dropped or delayed, affecting the sine wave's integrity.
+
+ACTION:
+ACTION:
+1. Check the Queue block's capacity and ensure it is large enough to handle the message flow without overflow.
+2. Verify that the "Overwrite oldest" option is enabled in the Queue block to manage message overflow gracefully.
+3. Review the real-time application's performance and CPU load to ensure it can handle the sample rate of 0.1.
+4. If the distortion persists, consider increasing the sample time of both Send and Receive blocks to reduce the system's load.
+5. Rebuild and download the model to the target hardware after making these changes.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signal-data-logging-from-send-and-receive-blocks.html) — Explains how Queue block capacity and overwrite settings impact message handling.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Discusses diagnosing and mitigating CPU overload issues in real-time applications.
+
+--------------------------------------------------------------------------------
+
+## Q2: Why does my Simulink Real‑Time model show CPU overload warnings?
+
+THOUGHT:
+THOUGHT:
+CPU overload warnings occur when the target computer's CPU cannot execute the model within the specified sample time, often due to high model complexity, fast sample rates, or inefficient code. Simplifying the model, adjusting sample rates, and optimizing code can resolve this issue.
+
+ACTION:
+ACTION:
+1. Simplify the model by reducing unnecessary complexity and optimizing algorithmic operations.
+2. Adjust the sample rates in your model to slower rates where possible to reduce CPU load.
+3. Enable optimizations like "Compile with GCC -ffast-math" in the model configuration parameters.
+4. Use the Overload Options block to configure allowable overloads and monitor CPU usage.
+5. Monitor CPU usage and execution time using the Simulation Data Inspector and CPU Overload Data.
+6. Reduce I/O latency by optimizing I/O channel usage and configuration.
+7. Consider upgrading hardware if the target computer is underpowered for the model requirements.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Explains CPU overload causes and solutions.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Describes how to configure overload options and monitor CPU usage.
+[3](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Discusses I/O latency and its impact on CPU overload.
+[4](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Provides guidance on monitoring and analyzing CPU overload data.
+[5](https://in.mathworks.com/help/slrealtime/ug/etas-inca-troubleshooting.html) — Covers optimization techniques for real-time applications.
+
+--------------------------------------------------------------------------------
+
+## Q3: How do I fix ‘License checkout failed’ when launching Simulink?
+
+THOUGHT:
+THOUGHT:
+The 'License checkout failed' error typically occurs due to issues with license server connectivity, incorrect license file paths, or an expired license. To resolve this, you need to verify your license configuration, check network connectivity to the license server, and ensure your license is valid.
+
+ACTION:
+ACTION:
+1. **Verify Network Connection**: Ensure your computer can connect to the license server. Check your network settings and firewall configurations.
+2. **Check License File Path**: Confirm the license file (license.lic) is correctly specified in your MATLAB preferences. 
+   - Open MATLAB Preferences (Home tab > Preferences > Licenses)
+   - Verify the License File location points to the correct file.
+3. **Validate License**: Check if your license is active and not expired:
+   - Contact your license administrator or use the MATLAB License Center to verify status.
+4. **Restart MATLAB**: After making changes, restart MATLAB to apply the updates.
+5. **Check for Multiple License Files**: Ensure there are no conflicting license files on your system.
+6. **Verify License Manager Service**: Ensure the FlexNet License Manager service is running on your system.
+
+EVIDENCE:
+[1](https://www.mathworks.com/help/licenses/guide.html) — Provides guidance on troubleshooting license issues in MATLAB.
+[2](https://www.mathworks.com/help/licenses/administrative.html) — Details how to configure license files and server settings.
+[3](https://www.mathworks.com/support.html) — Offers support resources for resolving licensing problems.
+
+--------------------------------------------------------------------------------
+
+## Q4: What causes buffer overflow in a UDP Receive block on the target?
+
+THOUGHT:
+THOUGHT:
+A buffer overflow in a UDP Receive block occurs when the receive buffer is too small to handle the incoming data rate, causing data to be dropped. This is often due to mismatched data rates, insufficient buffer size, or network bandwidth limitations.
+
+ACTION:
+ACTION:
+1. Check and increase the buffer size in the UDP Receive block if necessary.
+2. Verify the data rate from the sender matches the receiver's capacity.
+3. Ensure the network can handle the data throughput without packet loss.
+4. Use a packet capture tool to monitor and analyze the incoming UDP traffic.
+5. Consider optimizing the model or reducing CPU load on the target computer.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Explains how CPU overload can affect data processing and buffer behavior.
+[2](https://in.mathworks.com/help/slrealink/ug/troubleshoot-gaps-in-streamed-data.html) — Discusses network buffer overruns and data loss during streaming.
+[3](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signals-for-streaming-or-file-log-logging.html) — Covers signal logging issues and workarounds for data continuity.
+
+--------------------------------------------------------------------------------
+
+## Q5: Simulink Real‑Time: Real‑Time tab disappeared – how do I restore it?
+
+THOUGHT:
+THOUGHT:
+The Real-Time tab is missing because the model is not configured for Simulink Real-Time or the necessary software isn't installed. To restore it, you need to enable Simulink Real-Time configuration and verify software installation.
+
+ACTION:
+ACTION:
+1. Open Model Configuration Parameters and navigate to the Real-Time tab.
+2. Ensure Simulink Real-Time is installed by checking the MATLAB Add-Ons menu.
+3. If using an older model, run the Upgrade Advisor to update for compatibility.
+4. Close and reopen the model after making changes.
+5. If issues persist, contact MathWorks Support for further assistance.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-missing-real-time-tab.html) — Explains how to restore the Real-Time tab by configuring the model.
+[2](https://in.mathworks.com/help/slrealtime/ug/find-simulink-real-time-support.html) — Provides support resources if the issue isn't resolved.
+
+--------------------------------------------------------------------------------
+
+## Q6: Why are some signals missing from my data logs after streaming?
+
+THOUGHT:
+THOUGHT:
+Some signals may be missing from data logs due to issues like signal accessibility, data rate limitations, or logging configuration problems. Common causes include signals not being globally accessible, having inherited sample times, or being connected to message blocks. Additionally, high data rates or small buffer sizes can cause data loss during streaming.
+
+ACTION:
+ACTION:
+1. Verify signal accessibility:
+   - Ensure signals are not virtual, bus, or optimized away.
+   - Use Signal Copy blocks to make signals globally accessible for logging.
+2. Check signal properties:
+   - Confirm signals have explicit sample times (not inherited).
+   - Ensure signals are contiguous and not discontiguous.
+3. Adjust data logging settings:
+   - Increase the logging buffer size or decrease the data rate.
+   - Use decimation to reduce the amount of data logged.
+4. Resolve message block connections:
+   - Log signals before they enter Send/MessageSend blocks.
+   - Avoid logging message outputs directly.
+5. Monitor for data overload:
+   - Reduce the number of signals being logged.
+   - Consider switching to file logging for higher data capacity.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signals-for-streaming-or-file-log-logging.html) — Explains common signal accessibility issues and workarounds.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-gaps-in-streamed-data.html) — Describes data rate and buffer size considerations for streaming.
+[3](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signals-not-accessible-by-name.html) — Discusses virtual and bus signal limitations for logging.
+[4](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signals-for-streaming-or-file-log-logging.html) — Provides workarounds for message block connections and signal properties.
+
+--------------------------------------------------------------------------------
+
+## Q7: How can I reduce unsatisfactory real‑time performance on Speedgoat hardware?
+
+THOUGHT:
+THOUGHT:
+Unsatisfactory real-time performance on Speedgoat hardware can stem from high CPU utilization, inefficient model design, or suboptimal target computer configuration. Addressing this requires optimizing the model, adjusting sample rates, and ensuring the target hardware is appropriately configured.
+
+ACTION:
+ACTION:
+1. Optimize your Simulink Real-Time model by simplifying algorithms and reducing task execution time (TET).
+2. Adjust the sample times in your model to avoid unnecessary computational load while maintaining required performance.
+3. Enable compiler optimizations like "Compile with GCC -ffast-math" to improve execution speed.
+4. Monitor and reduce CPU overload by enabling CPU overload protection if necessary.
+5. Consider upgrading to a more powerful Speedgoat target machine if hardware limitations persist.
+6. Verify and optimize I/O configurations to minimize latency and ensure timely execution.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-unsatisfactory-real-time-performance.html) — Details methods to improve run-time performance and reduce TET.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-overloaded-cpu-from-executing-real-time-application.html) — Explains CPU overload issues and mitigation strategies.
+[3](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-gaps-in-streamed-data.html) — Discusses I/O latency and its impact on real-time performance.
+[4](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-model-links-to-static-libraries-or-shared-objects.html) — Provides guidance on optimizing library usage for better performance.
+[5](https://in.mathworks.com/help/slrealtime/ug_upgrade/troubleshoot-model-upgrade-to-r2020b.html) — Offers solutions for model upgrades and configuration improvements.
+[6](https://in.mathworks.com/help/slrealtime/ug_upgrade/troubleshoot-system-upgrade-to-r2020b.html) — Explains OS upgrades and hardware configuration for improved performance.
+
+--------------------------------------------------------------------------------
+
+## Q8: I get ‘XYZ:UNKNOWN’ error building my model – what does it mean?
+
+THOUGHT:
+THOUGHT:
+The 'XYZ:UNKNOWN' error during model building typically indicates an unsupported or unrecognized block in your Simulink Real-Time model. This could be due to custom or third-party blocks, outdated block libraries, or compatibility issues with the target hardware.
+
+ACTION:
+ACTION:
+1. Check for custom or third-party blocks in your model and verify their compatibility with Simulink Real-Time.
+2. Update all block libraries and toolboxes to ensure you're using the latest versions.
+3. Review the model for any unsupported blocks for your specific target hardware.
+4. Verify that the model configuration parameters are correctly set and compatible with the target.
+5. If using custom blocks, ensure they are properly compiled and linked.
+6. Contact MathWorks Support if the issue persists after checking all blocks and configurations.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-folder-names-with-spaces-or-special-characters-halt-model-builds.html) — Explains how unsupported characters in file paths can cause build errors.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-model-links-to-static-libraries-or-shared-objects.html) — Discusses issues with custom libraries and compatibility.
+[3](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-folder-names-with-spaces-or-special-characters-halt-model-builds.html) — Provides solutions for resolving build errors related to file paths.
+
+--------------------------------------------------------------------------------
+
+## Q9: How do I profile task execution time on the real‑time target?
+
+THOUGHT:
+THOUGHT:
+To profile task execution time on the real-time target, you need to enable function execution profiling in the model configuration, build and download the model, and use the Task Profiler to collect and analyze execution data. This helps identify performance bottlenecks and optimize real-time task execution.
+
+ACTION:
+ACTION:
+1. Open the Configuration Parameters dialog for your model.
+2. Enable function execution profiling in the Real-Time section.
+3. Build and download the model to the real-time target.
+4. Start the Task Profiler using the Simulink Real-Time interface.
+5. Run the model and collect execution data.
+6. Stop the profiler and retrieve the data for analysis.
+7. Use the plot function to visualize the profiler data.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-unsatisfactory-real-time-performance.html) — Explains how to enable function execution profiling and collect data for analysis.
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-unsatisfactory-real-time-performance.html) — Describes the process of starting and stopping the profiler and plotting the results.
+
+--------------------------------------------------------------------------------
+
+## Q10: What’s the correct way to increase queue capacity for message bus signals?
+
+THOUGHT:
+THOUGHT:
+To increase queue capacity for message bus signals, you need to adjust the queue size in the Send or Receive block parameters to prevent data loss during transmission. This ensures that messages are not overwritten or dropped when the queue is full.
+
+ACTION:
+ACTION:
+1. Open your Simulink Real-Time model and locate the Send or Receive block.
+2. Right-click the Send block and select "Block Parameters."
+3. In the Send block parameters, find the "Queue length" parameter and increase its value to the desired capacity.
+4. If using a Receive block, right-click it and select "Block Parameters."
+5. In the Receive block parameters, adjust the "Buffer size" to match your needs for message storage.
+6. Rebuild and run the model to test if the queue capacity issue is resolved.
+
+EVIDENCE:
+[1](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signal-data-logging-from-send-and-receive-blocks.html) — Explains how to configure queue length in Send and Receive blocks to manage message capacity.  
+[2](https://in.mathworks.com/help/slrealtime/ug/troubleshoot-signals-for-streaming-or-file-log-logging.html) — Describes adjusting buffer sizes to prevent data loss during signal transmission.
+
+--------------------------------------------------------------------------------
+
+## Q11: Which solver settings are recommended for 1 kHz fixed‑step real‑time execution?
+
+### THOUGHT
+THOUGHT:
+For 1 kHz real-time execution, using the 'FixedStep' solver with the 'Auto' method and 'Discrete' solver type is recommended. This configuration ensures deterministic behavior and optimal performance for fixed-step applications.
+
+### ACTION
+ACTION:
+1. Open the Configuration Parameters dialog box.
+2. Navigate to the Solver section.
+3. Under Solver selection, set Type to 'FixedStep'.
+4. Set the Solver to 'Auto' to automatically determine the step size.
+5. Under Solver details, set the Fixed-step size to 0.001 seconds for 1 kHz execution.
+6. Ensure the Solver type is set to 'Discrete' for real-time applications.
+7. Apply the changes and verify real-time performance.
+
+### EVIDENCE
+*missing*
+
+--------------------------------------------------------------------------------
+
+## Q12: Why can’t I connect to the target computer over Ethernet in MATLAB R2023b?
+
+### THOUGHT
+THOUGHT:
+The connection issue could be due to an incorrect IP address configuration, firewall restrictions, or a faulty Ethernet connection. Verifying the target computer's IP address, checking firewall settings, and ensuring the Ethernet cable is properly connected are essential first steps to resolve the connection problem.
+
+### ACTION
+ACTION:
+1. Verify the target computer's IP address by opening the MATLAB command window and typing `slrtExplorer()`. Ensure the IP address matches the one configured in your target computer definition.
+2. Check the Ethernet connection by testing the cable and ensuring both ends are securely connected. Restart the target computer and development computer to refresh the connection.
+3. Disable any firewall restrictions on the target computer that might block MATLAB's communication ports.
+4. If the issue persists, reinstall the Simulink Real-Time software on the target computer using the command `update(tg, 'force', true)` in the MATLAB command window.
+5. Reset the target computer to its factory settings if none of the above steps resolve the issue.
+
+### EVIDENCE
+*missing*
+
+--------------------------------------------------------------------------------
+
+## Q13: How do I deploy a Simulink model with CAN I/O blocks to real‑time hardware?
+
+### THOUGHT
+THOUGHT:
+To deploy a Simulink model with CAN I/O blocks to real-time hardware, you need to configure the model for real-time execution, set up the CAN I/O blocks with the correct hardware settings, and deploy the model to the target hardware. This involves selecting the correct system target file, configuring the CAN device, and ensuring proper communication settings.
+
+### ACTION
+ACTION:
+1. Open your Simulink model and navigate to the Model Configuration Parameters (Ctrl + E).
+2. In the Configuration Parameters, select the correct System Target File for real-time execution.
+3. Configure the CAN I/O blocks with the appropriate device and channel settings for your hardware.
+4. Set the fixed-step solver and sample time in the Configuration Parameters.
+5. Build the model using the Simulink Real-Time tab or by running `slbuild('your_model_name')`.
+6. Connect to the target hardware using the Simulink Real-Time Explorer.
+7. Download the application to the target hardware using the `load_and_start` command or the Simulink Real-Time tab.
+8. Monitor the application execution using scopes or the Simulation Data Inspector.
+
+### EVIDENCE
+*missing*
+
+--------------------------------------------------------------------------------
+
+## Q14: What does the warning ‘parameter not tunable in real‑time’ mean?
+
+### THOUGHT
+THOUGHT:
+The warning indicates that a parameter cannot be adjusted during real-time execution because it is either not marked as tunable or uses an unsupported data type. This is a common issue in Simulink Real-Time where certain parameters cannot be modified without stopping and rebuilding the application.
+
+### ACTION
+ACTION:
+1. Check if the parameter is marked as tunable in the Simulink model.
+2. Verify that the parameter uses a supported data type for real-time tuning.
+3. If the parameter cannot be tuned, stop the real-time application, update the parameter, and rebuild the application.
+
+### EVIDENCE
+*missing*
+
+--------------------------------------------------------------------------------
+
+## Q15: How do I install Simulink Real‑Time software updates offline?
+
+### THOUGHT
+THOUGHT:
+To install Simulink Real-Time software updates offline, you need to download the update package from MathWorks and manually transfer it to the target machine. This process ensures the target computer receives the necessary updates without requiring a direct internet connection.
+
+### ACTION
+ACTION:
+1. Log in to your MathWorks account and download the Simulink Real-Time software update package from the MathWorks website.
+2. Transfer the downloaded package to the target machine using external storage or a network share.
+3. Install the update on the target machine by running the downloaded package with administrative privileges.
+4. After installation, restart the target computer and verify the update in SLRT Explorer.
+
+### EVIDENCE
+*missing*
+
+--------------------------------------------------------------------------------
+

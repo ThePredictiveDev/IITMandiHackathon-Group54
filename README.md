@@ -1,2 +1,0 @@
-# IITMandiHackathon
-Dataset And Description
