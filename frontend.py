@@ -1,3 +1,32 @@
+import logging, sys, os
+
+# ── Setup a root logger that writes to both console and a file ──
+LOG_PATH = os.path.join(os.path.dirname(__file__), "frontend.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-5s %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_PATH, mode="w", encoding="utf-8"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger()
+
+# ── Redirect any stray print(...) calls into the logger ──
+class _StreamToLogger:
+    def __init__(self, level):
+        self.level = level
+        self._buffer = ""
+    def write(self, msg):
+        msg = msg.rstrip()
+        if msg:
+            self.level(msg)
+    def flush(self):
+        pass
+
+sys.stdout = _StreamToLogger(logger.info)
+sys.stderr = _StreamToLogger(logger.error)
+
 #!/usr/bin/env python3
 import asyncio, json, re, gradio as gr
 from chatbot import run_chat_turn
