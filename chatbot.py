@@ -196,6 +196,28 @@ def run_chat_turn(user_input: str):
     )
     set_cached(user_input, {"display": main_display})
 
+# ── tiny helpers for the UI ──────────────────────────────────────────
+def clear_hot_cache() -> str:
+    """Flush entire Redis + in‑proc cache."""
+    from cache import _redis, _local_cache
+    try:
+        _redis.flushdb()
+    except Exception:
+        pass
+    _local_cache.clear()
+    return "✅ Response‑cache cleared."
+
+def clear_mem() -> str:
+    """Flush STM & LTM."""
+    from memory import _stm, _redis, LTM_KEY_HASH, LTM_KEY_SET
+    _stm.clear()
+    try:
+        _redis.delete(LTM_KEY_HASH, LTM_KEY_SET)
+    except Exception:
+        pass
+    return "🧹 Chat‑memory cleared."
+
+
 
 if __name__ == "__main__":
     while True:

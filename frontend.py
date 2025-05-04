@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import asyncio, json, re, gradio as gr
-from chatbot import run_chat_turn
+from chatbot import run_chat_turn, clear_hot_cache, clear_mem
 from memory  import get_memory
 
 # ────────── helpers ────────────────────────────────────────────────
@@ -79,13 +79,20 @@ async def chat_backend(user_msg, chat_hist):
         res = {"type": "error", "message": "Unexpected pipeline response."}
 
     # decide visible message
-    if res.get("type")=="pipeline":
-        answer = compact_answer(res["writer"])
-    else:
-        answer = res["message"]
+    if res.get("type") == "pipeline":
+        answer        = compact_answer(res["writer"])
+        cot_md        = full_cot_md(res)
+        logs_md       = detailed_logs(res)
+    elif res.get("type") == "pipeline_cached":
+        answer        = res["message"]                         # already compact
+        cot_md        = "*(retrieved from cache – CoT not stored)*"
+        logs_md       = "*(cached answer – raw logs unavailable)*"
+    else:                                   # error / memory / off‑topic …
+        answer        = res.get("message","")
+        cot_md        = ""
+        logs_md       = detailed_logs(res)
 
-    chat_hist.append({"role": "user",      "content": user_msg})
-    chat_hist.append({"role": "assistant", "content": answer})
+    chat_hist.append((user_msg, answer))
     mem_md  = format_memory_md()
     cot_md  = full_cot_md(res)
     log_md  = detailed_logs(res)
@@ -108,48 +115,56 @@ CSS = """
 #side-panels           {display:flex;flex-direction:column;gap:6px}
 .side-box              {max-height:260px;overflow:auto;}
 .gr-accordion .label   {font-weight:600}
+.gr-chatbot {border:1px solid #ddd}
 """
 
 with gr.Blocks(css=CSS, theme=gr.themes.Soft()) as demo:
-    gr.HTML("<h3 style='text-align:center;margin-bottom:4px'>🤖 MATLAB / Simulink Troubleshooter</h3>")
+    gr.HTML("<h3 style='text-align:center'>🤖 MATLAB / Simulink Troubleshooter</h3>")
 
     with gr.Row():
-        # -------- Left column: chat ----------
+        # chat & input
         with gr.Column(scale=3):
-            chatbot = gr.Chatbot(
-                                        label="Conversation",
-                                        height=460,
-                                        avatar_images=(None, "🤖"),
-                                        type="messages"          # suppress deprecation warning
-                                    )
-            txt_in  = gr.Textbox(
-                placeholder="Ask a MATLAB / Simulink troubleshooting question…",
-                show_label=False, lines=2, autofocus=True)
-            send_btn = gr.Button("Send", variant="primary")
-        # -------- Right column: insight panes -
-        with gr.Column(scale=2, elem_id="side-panels"):
-            with gr.Accordion("🧠 Memory", open=False):
-                mem_box = gr.Markdown(elem_id="mem-md", show_label=False, elem_classes="side-box")
-            with gr.Accordion("🔎 Full Chain‑of‑Thought", open=False):
-                cot_md  = gr.Markdown(elem_id="cot-md",  show_label=False, elem_classes="side-box")
-            with gr.Accordion("📜 Detailed Logs", open=False):
-                log_md  = gr.Markdown(elem_id="log-md",  show_label=False, elem_classes="side-box")
+            chatbot = gr.Chatbot(height=600, label=None)          # full‑height GPT‑like
+            with gr.Row():
+                txt_in  = gr.Textbox(
+                            placeholder="Ask a MATLAB / Simulink troubleshooting question…",
+                            show_label=False, lines=1, autofocus=True, scale=4)
+                send_btn   = gr.Button("Send",   variant="primary", scale=1)
+                clear_btn  = gr.Button("⟲ Reset chat", scale=1)
 
+        # side drawer (memory + logs) inside Tabs
+        with gr.Column(scale=1):
+            with gr.Tabs():
+                with gr.TabItem("🧠 Memory"):
+                    mem_box = gr.Markdown(elem_classes="side-box")
+                with gr.TabItem("🔍 Chain‑of‑Thought"):
+                    cot_md  = gr.Markdown(elem_classes="side-box")
+                with gr.TabItem("📜 Logs"):
+                    log_md  = gr.Markdown(elem_classes="side-box")
+                with gr.TabItem("🗑️ Controls"):
+                    gr.Markdown("*Maintenance*")
+                    clr_cache = gr.Button("Clear cache")
+                    clr_mem   = gr.Button("Clear memory")
 
-    # wiring
+    # ---------- wiring ----------
     def _disable(): return gr.update(interactive=False)
     def _enable():  return gr.update(interactive=True)
 
     send_btn.click(_disable,  None, send_btn)
     send_btn.click(chat_backend,
                    [txt_in, chatbot],
-                   [chatbot, mem_box, cot_md, log_md, txt_in]).then(
-                   _enable, None, send_btn)
+                   [chatbot, mem_box, cot_md, log_md, txt_in]
+                   ).then(_enable, None, send_btn)
 
     txt_in.submit(_disable, None, send_btn)\
           .then(chat_backend,
                 [txt_in, chatbot],
                 [chatbot, mem_box, cot_md, log_md, txt_in])\
           .then(_enable, None, send_btn)
+
+    clear_btn.click(lambda: ([], "", "", "", ""), outputs=[chatbot, mem_box, cot_md, log_md, txt_in])
+
+    clr_cache.click(lambda: clear_hot_cache(),   None, log_md)
+    clr_mem.click(  lambda: clear_mem(),        None, log_md)
 
 demo.launch(share=True)
