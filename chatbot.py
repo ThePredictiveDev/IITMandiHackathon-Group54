@@ -40,6 +40,18 @@ MAX_INPUT_CHARS = 800
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ADD once near other helpers (adapted identical version)
+def _writer_sections(txt: str) -> dict[str, str]:
+    spec = {"THOUGHT": "COT", "ACTION": "ACTION", "EVIDENCE": "EVIDENCE"}
+    out = {}
+    for lab, end in spec.items():
+        m = re.search(rf"<<{lab}>>(.*?)(?:<<END_{end}>>|$)", txt, re.S)
+        blk = m.group(1).strip() if m else ""
+        blk = re.sub(rf"^{lab}\s*:\s*", "", blk, flags=re.I)
+        out[lab] = blk
+    return out
+
+
 def run_chat_turn(user_input: str):
 
     if not user_input or not user_input.strip():
@@ -92,7 +104,7 @@ def run_chat_turn(user_input: str):
 
         add_to_memory("assistant", reply)
         print("\nAssistant:\n", reply)
-        return
+        return {"type": "memory", "message": reply}
     
     # ── Hot-path cache check ──
     cached = get_cached(user_input)
@@ -176,31 +188,13 @@ def run_chat_turn(user_input: str):
     print(json.dumps(output, indent=2, ensure_ascii=False))
 
     # ── Save into hot-path cache (15 min TTL) ──
-    # Extract only the user‐facing sections from writer’s streamed text
-    text = full  # full streamed writer output
-    m1 = re.search(r'<<THOUGHT>>(.*?)<<END_COT>>', text, re.S)
-    m2 = re.search(r'<<ACTION>>(.*?)<<END_ACTION>>', text, re.S)
-    m3 = re.search(
-        r'<<EVIDENCE>>[\s:]*EVIDENCE?:?\s*(.*?)(?:<<END_EVIDENCE>>|$)',
-        text, re.S)
-    thought  = m1.group(1).strip() if m1 else ""
-    action   = m2.group(1).strip() if m2 else ""
-    evidence = m3.group(1).strip() if m3 else ""
-
+    sections = _writer_sections(full)          # uses the new helper
     main_display = (
-        "THOUGHT:\n"  + thought  + "\n\n"
-        "ACTION:\n"   + action   + "\n\n"
-        "EVIDENCE:\n" + evidence
+        "THOUGHT:\n"  + sections["THOUGHT"]  + "\n\n"
+        "ACTION:\n"   + sections["ACTION"]   + "\n\n"
+        "EVIDENCE:\n" + sections["EVIDENCE"]
     )
     set_cached(user_input, {"display": main_display})
-
-    return {
-       "type":    "pipeline",
-       "planner": plan,    # full planner dict
-       "chunks":  topk,    # chunk dicts used
-       "verifier": verif,  # full verifier JSON
-       "writer":  full     # full writer text
-   }
 
 
 if __name__ == "__main__":

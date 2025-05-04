@@ -10,18 +10,29 @@ def format_memory_md():
     ltm = "\n".join(f"- {m['content']}"               for m in mem["ltm"]) or "*empty*"
     return f"### Short‑Term\n\n{stm}\n\n---\n\n### Long‑Term\n\n{ltm}"
 
-def writer_sections(txt:str):
-    sec,pat={},{"THOUGHT":"COT","ACTION":"ACTION","EVIDENCE":"EVIDENCE"}
-    for k,v in pat.items():
-        m=re.search(rf"<<{k}>>(.*?)<<END_{v}>>",txt,re.S)
-        sec[k]=m.group(1).strip() if m else ""
-    return sec
+# REPLACE the current writer_sections() helper WITH:
+def writer_sections(txt: str) -> dict[str, str]:
+    """
+    Robustly pull out THOUGHT / ACTION / EVIDENCE blocks.
+
+    • Works whether or not <<END_EVIDENCE>> is present.
+    • Strips a leading label inside the block (e.g. “EVIDENCE:”).
+    """
+    sections = {}
+    spec = {"THOUGHT": "COT", "ACTION": "ACTION", "EVIDENCE": "EVIDENCE"}
+    for lab, end in spec.items():
+        m = re.search(rf"<<{lab}>>(.*?)(?:<<END_{end}>>|$)", txt, re.S)
+        blk = m.group(1).strip() if m else ""
+        blk = re.sub(rf"^{lab}\s*:\s*", "", blk, flags=re.I)  # dedup label
+        sections[lab] = blk
+    return sections
+
 
 def compact_answer(txt:str):
     s=writer_sections(txt)
-    return f"#### THOUGHT\n{s['THOUGHT']}\n\n"\
-           f"#### ACTION\n{s['ACTION']}\n\n"\
-           f"#### EVIDENCE\n{s['EVIDENCE']}"
+    return f"### THOUGHT\n{s['THOUGHT']}\n\n"\
+           f"### ACTION\n{s['ACTION']}\n\n"\
+           f"### EVIDENCE\n{s['EVIDENCE']}"
 
 def detailed_logs(res: dict) -> str:
     """
@@ -62,6 +73,10 @@ def full_cot_md(res:dict)->str:
 async def chat_backend(user_msg, chat_hist):
     loop=asyncio.get_event_loop()
     res = await loop.run_in_executor(None, run_chat_turn, user_msg)
+
+     # ---- guarantee we have a dict ----
+    if not isinstance(res, dict):
+        res = {"type": "error", "message": "Unexpected pipeline response."}
 
     # decide visible message
     if res.get("type")=="pipeline":
