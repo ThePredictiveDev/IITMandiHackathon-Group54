@@ -40,6 +40,18 @@ MAX_INPUT_CHARS = 800
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+mem_prefix = get_memory()
+# Build a short “context” string:
+stm_text = "\n".join(f"{t['role']}: {t['content']}" for t in mem_prefix["stm"])
+ltm_text = "\n".join(f"Memory: {t['content']}" for t in mem_prefix["ltm"])
+context_prefix = (
+    "### Conversation history (last few turns):\n"
+    + stm_text
+    + (("\n### Longer‐term memories:\n" + ltm_text) if ltm_text else "")
+    + "\n### Now, new user query:\n"
+)
+
+
 # ADD once near other helpers (adapted identical version)
 def _writer_sections(txt: str) -> dict[str, str]:
     spec = {"THOUGHT": "COT", "ACTION": "ACTION", "EVIDENCE": "EVIDENCE"}
@@ -159,7 +171,7 @@ def run_chat_turn(user_input: str):
     verif = {}
     for attempt in range(1, 6):
         # writer streams, but we only capture the THOUGHT section
-        tokens = list(stream_answer(user_input, plan, topk))
+        tokens = list(stream_answer(context_prefix +  user_input, plan, topk))
         full = "".join(tokens)
         # extract writer cot between <<THOUGHT>> and <<END_COT>>
         start = full.find("<<THOUGHT>>")

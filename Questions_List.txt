@@ -1,0 +1,48 @@
+✅ On-Topic (Handled)
+“After setting my Receive block’s sample time to 0.2, why is my sine wave still distorted?”
+
+“I’m getting a ‘License checkout failed’ error when opening Simulink Real-Time—how do I fix it?”
+
+“How do I increase the UDP Queue block capacity to avoid buffer overflow on the target?”
+
+“Why does my Speedgoat CPU go into overload in a 1 kHz fixed-step real-time model?”
+
+“What does ‘XYZ:UNKNOWN’ mean when I build my Simulink model for real-time deployment?”
+
+“How can I restore the Real-Time tab after it disappeared in Simulink R2023b?”
+
+“Which solver settings are recommended for 500 Hz Simulink Real-Time execution?”
+
+“Why are some signals missing from my data log after streaming from the Target to MATLAB?”
+
+“How do I enable the ‘Overwrite oldest’ option on a Message Queue block?”
+
+“What was my last message about ‘queue’?”
+
+❌ Off-Topic (Rejected)
+“How do I make pancakes?”
+
+“What’s the weather forecast for New York City?”
+
+“Translate this sentence into Spanish.”
+
+“Write me a Python script to scrape stock prices.”
+
+“Tell me a joke about dogs.”
+
+Question Flow
+
+1. Empty Question
+
+2. Off Topic
+
+3. After setting my Receive block’s sample time to 0.2, why is my sine wave still distorted?
+
+4. After setting my Receive block’s sample time to 0.2, why is my sine wave still distorted?
+
+5. What was my last message about sample time
+
+6. What was my last message
+
+7. Normal Question again if wanted
+
