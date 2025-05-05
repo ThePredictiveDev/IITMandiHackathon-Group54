@@ -10,7 +10,8 @@ import time
 from groq import Groq
 
 # Instantiate Groq client
-client = Groq(api_key="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")
+API_KEY="" #YOUR_API_KEY_HERE
+client = Groq(api_key=API_KEY)
 
 # Few-shot system prompt
 SYSTEM_PROMPT = """You are a Planner Agent for a MATLAB Simulink Real-Time troubleshooting assistant.

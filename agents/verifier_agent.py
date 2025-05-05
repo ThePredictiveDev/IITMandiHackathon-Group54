@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-verifier_agent.py — Verifier Agent (CRAG-Lite) using Groq client
+verifier_agent.py — Verifier Agent (CRAG) using Groq client
 
 Uses llama-3.1-8b-instant to verify that the Writer’s solution
 is grounded in the Planner’s reasoning. Retries with increasing
@@ -12,7 +12,8 @@ import json
 from groq import Groq
 
 # Instantiate Groq client
-client = Groq(api_key="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")
+API_KEY="" #YOUR_API_KEY_HERE
+client = Groq(api_key=API_KEY)
 
 # System prompt for verification
 SYSTEM_PROMPT_VERIFY = """

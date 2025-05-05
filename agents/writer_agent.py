@@ -14,7 +14,8 @@ import json
 from groq import Groq
 
 # Instantiate Groq client
-client = Groq(api_key="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")
+API_KEY="" #YOUR_API_KEY_HERE
+client = Groq(api_key=API_KEY)
 
 # System prompt template
 SYSTEM_PROMPT = """
