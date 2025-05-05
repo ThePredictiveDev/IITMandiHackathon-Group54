@@ -37,7 +37,7 @@ What makes this project unique:
 
 ## 🏗 Architecture
 
-![Architecture Diagram](https://i.imgur.com/TBAeqSl.png)
+![Architecture Diagram](Final_Architecture.png)
 
 ### 4-Stage LLM Orchestration Pipeline
 
