@@ -8,14 +8,14 @@ chatbot.py — Orchestrator that prints only the four CoT stages:
 """
 
 import logging
-from memory import add_to_memory, get_memory
-from planner_agent import plan_fetch
-from retrieval import retrieve
-from writer_agent import stream_answer
-from verifier_agent import verify_solution
+from stores_mem_and_cache.memory import add_to_memory, get_memory
+from agents.planner_agent import plan_fetch
+from index_tools_build_and_retrieve.retrieval import retrieve
+from agents.writer_agent import stream_answer
+from agents.verifier_agent import verify_solution
 from langdetect import detect
 import re
-from cache import get_cached, set_cached
+from stores_mem_and_cache.cache import get_cached, set_cached
 import json
 
 
@@ -220,7 +220,7 @@ def run_chat_turn(user_input: str):
 # ── tiny helpers for the UI ──────────────────────────────────────────
 def clear_hot_cache() -> str:
     """Flush entire Redis + in‑proc cache."""
-    from cache import _redis, _local_cache
+    from stores_mem_and_cache.cache import _redis, _local_cache
     try:
         _redis.flushdb()
     except Exception:
@@ -230,7 +230,7 @@ def clear_hot_cache() -> str:
 
 def clear_mem() -> str:
     """Flush STM & LTM."""
-    from memory import _stm, _redis, LTM_KEY_HASH, LTM_KEY_SET
+    from stores_mem_and_cache.memory import _stm, _redis, LTM_KEY_HASH, LTM_KEY_SET
     _stm.clear()
     try:
         _redis.delete(LTM_KEY_HASH, LTM_KEY_SET)

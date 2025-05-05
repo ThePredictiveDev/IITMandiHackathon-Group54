@@ -2,7 +2,7 @@ import faiss
 import numpy as np
 
 # 1) Load your index
-index = faiss.read_index("faiss.index")
+index = faiss.read_index(r"C:\Users\Devansh\Downloads\IITMandiHackathon-Group54\data (json+index+raw csv)\faiss.indexx")
 
 # 2) Inspect properties
 print("Total vectors in index:", index.ntotal)

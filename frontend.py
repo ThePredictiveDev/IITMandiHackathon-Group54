@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import asyncio, json, re, gradio as gr
-from chatbot import run_chat_turn
-from memory  import get_memory
-from cache   import _redis as redis_client, _local_cache   # reuse existing objects
-from memory  import _stm
+from chatbot_dep import run_chat_turn
+from stores_mem_and_cache.memory  import get_memory, _stm
+from stores_mem_and_cache.cache   import _redis as redis_client, _local_cache   # reuse existing objects
 
 # ────────── helpers ────────────────────────────────────────────────
 def format_memory_md():

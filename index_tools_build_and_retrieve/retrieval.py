@@ -15,7 +15,7 @@ import json
 import faiss
 from sentence_transformers import SentenceTransformer
 
-from planner_agent import plan_fetch, score_chunks
+from agents.planner_agent import plan_fetch, score_chunks
 
 # ——————— Configuration ———————
 FAISS_INDEX_PATH = "faiss.index"
@@ -25,11 +25,11 @@ EMBED_DEVICE     = "cuda" if faiss.get_num_gpus() > 0 else "cpu"
 # ————————————————————————————
 
 # 1) Load FAISS index
-_index = faiss.read_index(FAISS_INDEX_PATH)
+_index = faiss.read_index(r"data (json+index+raw csv)\faiss.index")
 
 # 2) Load chunks in the same order used during indexing
 _chunk_list = []
-with open(CHUNKS_PATH, "r", encoding="utf-8") as f:
+with open(r"data (json+index+raw csv)\docs_chunks.jsonl", "r", encoding="utf-8") as f:
     for line in f:
         rec = json.loads(line)
         _chunk_list.append(rec)

@@ -13,11 +13,11 @@ until the Verifier returns "Yes" or a maximum of 5 attempts is reached.
 """
 
 import json
-from planner_agent import plan_fetch
-from retrieval import retrieve
-from writer_agent import stream_answer
-from verifier_agent import verify_solution
-from cache import get_cached, set_cached
+from agents.planner_agent import plan_fetch
+from index_tools_build_and_retrieve.retrieval import retrieve
+from agents.writer_agent import stream_answer
+from agents.verifier_agent import verify_solution
+from stores_mem_and_cache.cache import get_cached, set_cached
 
 def main():
     # 1) Hardcoded test query

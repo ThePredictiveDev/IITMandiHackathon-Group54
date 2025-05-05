@@ -9,7 +9,7 @@ Requirements:
 """
 
 import datetime, json, pathlib
-from chatbot import run_chat_turn   # uses the full pipeline you’ve built
+from chatbot_dep import run_chat_turn   # uses the full pipeline you’ve built
 import re
 
 # ------------------------------------------------------------------

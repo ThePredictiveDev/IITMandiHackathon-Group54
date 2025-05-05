@@ -4,8 +4,8 @@ test_retrieval_simple.py — Simple end-to-end retrieval + COT display
 Hardcoded query, prints planner public reasoning and each chunk’s public COT.
 """
 
-from planner_agent import plan_fetch
-from retrieval import retrieve
+from agents.planner_agent import plan_fetch
+from index_tools_build_and_retrieve.retrieval import retrieve
 
 if __name__ == "__main__":
     # 1) Hardcoded test query

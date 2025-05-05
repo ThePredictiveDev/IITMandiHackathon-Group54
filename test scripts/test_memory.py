@@ -4,8 +4,8 @@ test_memory.py — Smoke test for STM & LTM from memory.py
 """
 
 import time
-from memory import add_to_memory, get_memory, STM_MAX_TURNS, LTM_TTL_SECONDS
-import memory
+from stores_mem_and_cache.memory import add_to_memory, get_memory, STM_MAX_TURNS, LTM_TTL_SECONDS
+import stores_mem_and_cache.memory as memory
 
 def main():
     test_ttl = 10
